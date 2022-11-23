@@ -13,4 +13,5 @@ vector = model[corpus[0]]
 
 nmf = Nmf(corpus, num_topics=10)
 temp_file = datapath("model")
+print(temp_file)
 nmf.save(temp_file)
