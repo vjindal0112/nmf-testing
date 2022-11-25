@@ -18,8 +18,8 @@ STOPWORDS.add("depend")
 
 # for every file in the training-data folder, read the file and add to a list called corpus
 for filename in os.listdir("training-data/set-1/"):
-    with open("training-data/set-1/" + filename, "r") as f:
-        corpus.append(f.read())
+  with open("training-data/set-1/" + filename, "r") as f:
+    corpus.append(f.read())
 
 # lemmatize each word in the corpus
 # LEMMATIZATION
@@ -28,16 +28,16 @@ for filename in os.listdir("training-data/set-1/"):
 lemmmatizer = WordNetLemmatizer()
 
 for i in range(len(corpus)):
-    words = word_tokenize(corpus[i])
+  words = word_tokenize(corpus[i])
 
-    # List comprehension
-    words = [lemmmatizer.lemmatize(
-        word.lower()) for word in words]
+  # List comprehension
+  words = [lemmmatizer.lemmatize(
+      word.lower()) for word in words]
 
-    # remove all words that are in STOPWORDS from words
-    words = [w for w in words if not w in STOPWORDS]
+  # remove all words that are in STOPWORDS from words
+  words = [w for w in words if not w in STOPWORDS]
 
-    corpus[i] = ' '.join(words)
+  corpus[i] = ' '.join(words)
 # print(corpus)
 
 # make the corpus into a document-term frequency matrix
@@ -55,7 +55,7 @@ nmf = Nmf(BoW_corpus, num_topics=10, id2word=dictionary)
 
 test_doc = ""
 with open("testing-data/set-1/" + "Ancient Rome.md", "r") as f:
-    test_doc = f.read()
+  test_doc = f.read()
 
 test_doc = word_tokenize(test_doc)
 # List comprehension
@@ -71,8 +71,8 @@ vector = nmf[test_bow_corpus]
 # TODO figure out what is actually in the vector
 print(vector)
 for topic in vector:
-    print(topic)
-    nmf.show_topic(topic[0])
+  print(topic)
+  nmf.show_topic(topic[0])
 
 print()
 print()
@@ -80,4 +80,4 @@ print("----------- ALL TOPICS -----------")
 print()
 
 for topic in nmf.print_topics():
-    print(topic)
+  print(topic)

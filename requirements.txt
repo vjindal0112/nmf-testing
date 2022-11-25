@@ -193,6 +193,7 @@ Pygments==2.13.0
 pylint @ file:///opt/concourse/worker/volumes/live/39bfc6db-5da7-4bc4-5240-e8a1167491ff/volume/pylint_1617135827184/work
 pyls-black @ file:///tmp/build/80754af9/pyls-black_1607553132291/work
 pyls-spyder @ file:///tmp/build/80754af9/pyls-spyder_1613849700860/work
+pymediawiki==0.7.2
 pyodbc===4.0.0-unsupported
 pyOpenSSL @ file:///tmp/build/80754af9/pyopenssl_1608057966937/work
 pyparsing @ file:///home/linux1/recipes/ci/pyparsing_1610983426697/work

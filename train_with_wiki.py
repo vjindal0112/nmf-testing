@@ -1,40 +1,69 @@
-from gensim.models import Nmf
-import gensim.downloader as api
-from gensim.models import TfidfModel
-from gensim.corpora import Dictionary
-from gensim.test.utils import datapath
-import wikipedia
+# from gensim.models import Nmf
+# import gensim.downloader as api
+# from gensim.models import TfidfModel
+# from gensim.corpora import Dictionary
+# from gensim.test.utils import datapath
+from mediawiki import MediaWiki
+import time
+
 
 NUM_TOPICS = 2
 
-LIST_OF_PAGES = [
-    "Computer",
-    "Computer science",
-    "Computer programming",
-    "Computer hardware",
-    "Computer software",
-    "Computer network",
-    "Computer virus",
-    "Computer mouse",
-    "Computer keyboard",
-    "Computer monitor",
-    "New york city",
-    "Statue of liberty",
-    "Central park",
-    "Empire state building",
-    "Times square",
-    "Brooklyn bridge",
-    "Grand central terminal",
-    "Rockefeller center",
-    "Chrysler building",
-]
-
-for page in LIST_OF_PAGES:
-  print(page)
-  print(wikipedia.summary(page))
-  print()
+# LIST_OF_PAGES = [
+#     "Computer",
+#     "Computer science",
+#     "Computer programming",
+#     "Computer hardware",
+#     "Computer software",
+#     "Computer network",
+#     "Computer virus",
+#     "Computer mouse",
+#     "Computer keyboard",
+#     "Computer monitor",
+#     "New york city",
+#     "Statue of liberty",
+#     "Central park",
+#     "Empire state building",
+#     "Times square",
+#     "Brooklyn bridge",
+#     "Grand central terminal",
+#     "Rockefeller center",
+#     "Chrysler building",
+# ]
+wikipedia = MediaWiki()
 
 
+# ['Computers', 'Consumer electronics', 'Electronics industry']
+
+# for page_name in LIST_OF_PAGES:
+#   page = wikipedia.page(page_name)
+#   time.sleep(0.20)
+#   print(page.title)
+#   print(page.summary)
+
+
+# for every page in LIST_OF_PAGES write the summary to a file
+for page_name in LIST_OF_PAGES:
+  page = wikipedia.page(page_name)
+  with open(f'./training-data/set-2/{page_name}.txt', 'w') as f:
+    for category in page.categories:
+      f.write(category + "~")
+    f.write("\n||||||\n")
+    f.write(f'{page.title}\n')
+    f.write("||||||\n")
+    f.write(page.summary)
+
+
+# p = wikipedia.page('Chess')
+# p.title
+# p.summary
+# p.categories
+# p.images
+# p.links
+# p.langlinks
+# p.content
+
+# wikipedia.random(pages=3)
 # texts = [['human', 'interface', 'computer']]
 # dct = Dictionary(texts)  # initialize a Dictionary
 # # add more document (extend the vocabulary)
