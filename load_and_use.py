@@ -8,16 +8,16 @@ import time
 
 startTime = time.time()
 dataset = api.load("text8")
-print("load dataset:", time.time() - startTime )
+print("load dataset:", time.time() - startTime)
 
 startTime = time.time()
 dct = Dictionary(dataset)  # fit dictionary
-print("load dct of dataset:", time.time() - startTime )
+print("load dct of dataset:", time.time() - startTime)
 
 startTime = time.time()
 temp_file = datapath("model")
 nmf = Nmf.load(temp_file)
-print("nmf.load:", time.time() - startTime )
+print("nmf.load:", time.time() - startTime)
 
 other_texts = [
     ['computer', 'time', 'graph'],
