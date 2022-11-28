@@ -7,13 +7,14 @@ from gensim.utils import simple_preprocess
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 from gensim.corpora import Dictionary
-from gensim.models import Nmf
+from gensim.models import LdaModel, Phrases
 from gensim.test.utils import datapath
+from gensim.models.phrases import Phraser
 import string
 
 # gensim.corpora.TextCorpus -> plain text -> bow vectors
 # https://tedboy.github.io/nlps/generated/generated/gensim.corpora.TextCorpus.html#gensim.corpora.TextCorpus
-NUM_TOPICS = 4
+NUM_TOPICS = 5
 
 
 def remove_all_symbols(text: str) -> str:
@@ -61,13 +62,16 @@ for file_name in os.listdir('./training-data/set-2'):
     # summary = file[2]
 
     file_words = clean_text(file)
+    # higher threshold fewer phrases.
+    bigram = Phrases(file_words, min_count=5, threshold=100)
+    bigram_mod = Phraser(bigram)
     corpus.append(file_words)
 
 # Train nmf model from the corpus
 dct = Dictionary(corpus)
 BoW_corpus = [dct.doc2bow(doc, allow_update=True)
               for doc in corpus]
-nmf = Nmf(BoW_corpus, num_topics=NUM_TOPICS, id2word=dct)
+nmf = LdaModel(BoW_corpus, num_topics=NUM_TOPICS, id2word=dct)
 
 print("TOPIC TERMS")
 for x in range(NUM_TOPICS):
