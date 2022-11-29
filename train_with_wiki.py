@@ -79,3 +79,4 @@ for x in range(NUM_TOPICS):
 temp_file = datapath("model")
 print(temp_file)
 nmf.save(temp_file)
+dct.save("./saved-dict")
