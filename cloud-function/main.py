@@ -4,6 +4,7 @@ from google.cloud import storage
 from nltk.corpus import stopwords
 import re
 from nltk.stem import WordNetLemmatizer
+import json
 
 
 def load_and_use_model(request):
@@ -16,34 +17,39 @@ def load_and_use_model(request):
       `make_response <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>`.
   """
   request_json = request.get_json()
-  print(request_json)
-  print(request.args)
   if 'note_text' in request_json:
-    # Instantiates a client
+    # Instantiates a storage client
     storage_client = storage.Client()
 
-    # The name for the new bucket
+    # Get model and dicionary from bucket
     bucket_name = "nlp-model-store"
     bucket = storage_client.get_bucket(bucket_name)
     model_blob = bucket.blob("model")
     dct_blob = bucket.blob("dictionary")
-    with open('./tmp/model', 'wb') as f:
+    with open('/tmp/model', 'wb') as f:
       model_blob.download_to_file(f)
-    with open('./tmp/dictionary', 'wb') as f:
+    with open('/tmp/dictionary', 'wb') as f:
       dct_blob.download_to_file(f)
-    nmf = Nmf.load("./tmp/model")
-    dct = Dictionary.load("./tmp/dictionary")
-    print("ID TO WORD")
-    for x in nmf.id2word.iteritems():
-      print(x)
+    nmf = Nmf.load("/tmp/model")
+    dct = Dictionary.load("/tmp/dictionary")
+
+    # Create list of tags associated with each topic
+    TOPICS_TO_TAGS = []
+    for topic in nmf.show_topics(num_topics=10, num_words=10, formatted=False):
+      # Example topic looks like:
+      # (0, [('new', 0.04927730786772849), ('york', 0.045536340221838695), ('city', 0.03610552021069998), ('state', 0.022837394513592096), ('manhattan', 0.02158441764544512), ('world', 0.015081501532756553), ('united', 0.014942394226562994), ('computer', 0.014220414818740834), ('central', 0.013146910359001075), ('national', 0.012290741830119386)])
+      TOPICS_TO_TAGS.append(topic[1][0][0])
+
+    # Get tags for new document (note_text)
     doc = dct.doc2bow(clean_text(request_json['note_text']))
     prediction = nmf[doc]
-    print(prediction)
-    for x in prediction:
-      print(x)
-    return "works"
+    tags = []
+    for topic in prediction:
+      if topic[1] > 0.15:
+        tags.append((TOPICS_TO_TAGS[topic[0]], topic[1]))
+    return json.dumps(tags), 200, {"Content-Type": "application/json"}
 
-  return "Didn't work"
+  return json.dumps({"error": "no note_text in request"}), 400, {"Content-Type": "application/json"}
 
 
 def remove_all_symbols(text: str) -> str:
@@ -67,8 +73,6 @@ def clean_text(text_str: str) -> list:
 
   text_str = remove_all_symbols(text_str)
   words = text_str.split(" ")
-  # words = simple_preprocess(text_str)
-  # words = word_tokenize(text_str)
 
   lemmmatizer = WordNetLemmatizer()
   words = [lemmmatizer.lemmatize(word.lower()) for word in words]
