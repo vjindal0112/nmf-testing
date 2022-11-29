@@ -1,10 +1,17 @@
+# This is the file version which is uploaded to the cloud function via zip file
 from gensim.models import Nmf
 from gensim.corpora import Dictionary
 from google.cloud import storage
-from nltk.corpus import stopwords
+from nltk import data
 import re
 from nltk.stem import WordNetLemmatizer
 import json
+
+# Instantiates a storage client
+storage_client = storage.Client()
+
+# Enables nltk to look for data in /nltk_data
+data.path.append('./nltk_data')
 
 
 def load_and_use_model(request):
@@ -18,20 +25,7 @@ def load_and_use_model(request):
   """
   request_json = request.get_json()
   if 'note_text' in request_json:
-    # Instantiates a storage client
-    storage_client = storage.Client()
-
-    # Get model and dicionary from bucket
-    bucket_name = "nlp-model-store"
-    bucket = storage_client.get_bucket(bucket_name)
-    model_blob = bucket.blob("model")
-    dct_blob = bucket.blob("dictionary")
-    with open('/tmp/model', 'wb') as f:
-      model_blob.download_to_file(f)
-    with open('/tmp/dictionary', 'wb') as f:
-      dct_blob.download_to_file(f)
-    nmf = Nmf.load("/tmp/model")
-    dct = Dictionary.load("/tmp/dictionary")
+    nmf, dct = load_model()
 
     # Create list of tags associated with each topic
     TOPICS_TO_TAGS = []
@@ -52,6 +46,27 @@ def load_and_use_model(request):
   return json.dumps({"error": "no note_text in request"}), 400, {"Content-Type": "application/json"}
 
 
+def load_model():
+  # load model and dictionary from uploaded files
+  nmf = Nmf.load('./nlp_store/model')
+  dct = Dictionary.load('./nlp_store/dictionary')
+  return nmf, dct
+
+
+def load_stopwords():
+  # Get stopwords from uploaded file
+  with open('./nltk_data/corpora/stopwords/english', 'r') as f:
+    STOPWORDS = set(f.read().split("\n"))
+    STOPWORDS.add("also")
+    STOPWORDS.add("however")
+    STOPWORDS.add("in")
+    STOPWORDS.add("depends")
+    STOPWORDS.add("depend")
+    STOPWORDS.add("")
+    STOPWORDS.add("wa")
+    return STOPWORDS
+
+
 def remove_all_symbols(text: str) -> str:
   text = re.sub("http[s]?\://\S+", "", text)  # remove urls
   text = re.sub(r"[0-9]", "", text)  # remove numbers
@@ -62,14 +77,7 @@ def remove_all_symbols(text: str) -> str:
 
 
 def clean_text(text_str: str) -> list:
-  STOPWORDS = set(stopwords.words('english'))
-  STOPWORDS.add("also")
-  STOPWORDS.add("however")
-  STOPWORDS.add("in")
-  STOPWORDS.add("depends")
-  STOPWORDS.add("depend")
-  STOPWORDS.add("")
-  STOPWORDS.add("wa")
+  STOPWORDS = load_stopwords()
 
   text_str = remove_all_symbols(text_str)
   words = text_str.split(" ")
