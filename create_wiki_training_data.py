@@ -4,70 +4,44 @@
 # from gensim.corpora import Dictionary
 # from gensim.test.utils import datapath
 from mediawiki import MediaWiki
+import os.path
+import time 
+import random
+from mediawiki import DisambiguationError
 
-LIST_OF_PAGES = [
-    # "Computer",
-    # "Computer science",
-    # "Computer programming",
-    # "Computer hardware",
-    # "Computer software",
-    # "Computer network",
-    # "Computer virus",
-    # "Computer mouse",
-    # "Computer keyboard",
-    # "Computer monitor",
-    # "New york city",
-    # "Statue of liberty",
-    # "Central park",
-    # "Empire state building",
-    # "Times square",
-    # "Brooklyn bridge",
-    # "Grand central terminal",
-    # "Rockefeller center",
-    # "Chrysler building",
-    # "Programming lanuage",
-    # "Graphics processing unit",
-    # "Computer graphics",
-    # "Computer vision",
-    # "Machine learning",
-    # "Artificial intelligence",
-    # "Data science",
-    # "Data mining",
-    # "Data engineering",
-    # "Data analysis",
-    # "Data visualization",
-    # "Data warehouse",
-    # "Data lake",
-    "Computer architecture",
-    "Computer engineering",
-    "Computer security",
-    "Control unit",
-    "Computer memory",
-    "Computer processor",
-    "Computer motherboard",
-    "Computer bus",
-    "Cracking (software)",
-    "Cryptography",
-    "Finite state automaton",
-    "Hacker (computer security)",
-    "Human-computer interaction",
-    "Kilobyte",
-    "Multiprocessing",
-    "Operating system",
-    "Scripting language",
-    "Virtual memory",
-    "World wide web"
-]
-wikipedia = MediaWiki()
+f = open("LIST_OF_PAGES.txt" , "r")
+LIST_OF_PAGES = f.read().split("\n")
+wikipedia = MediaWiki(user_agent="Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.52 Safari/536.5")
+wikipedia.rate_limit = True
+# wikipedia.rate_limit_min_wait = 0.5
+try:
+  # for every page in LIST_OF_PAGES write the summary to a file
+  for page_name in LIST_OF_PAGES:
+    if os.path.isfile(f'./training-data/set-2/{page_name}.txt'):
+      continue
+    try:
+      page = wikipedia.page(page_name)
+      # Change set before running!
+      if len(page.summary) < 2:
+        LIST_OF_PAGES.remove(page_name)
+        with open("LIST_OF_PAGES.txt", 'w') as f:
+          f.write("\n".join(LIST_OF_PAGES))
+      with open(f'./training-data/set-2/{page_name}.txt', 'w') as f:
+        for category in page.categories:
+          f.write(category + "~")
+        f.write("\n||||||\n")
+        f.write(f'{page.title}\n')
+        f.write("||||||\n")
+        f.write(page.summary)
+    except DisambiguationError:
+      LIST_OF_PAGES.remove(page_name)
+      with open("LIST_OF_PAGES.txt", 'w') as f:
+        f.write("\n".join(LIST_OF_PAGES))
+    except Exception as e:
+      print("error: ", str(e), " page_name: ", page_name)
+except KeyboardInterrupt as ke:
+  print("hello jke")
+  with open("LIST_OF_PAGES.txt", 'w') as f:
+    f.write("\n".join(LIST_OF_PAGES))
 
-# for every page in LIST_OF_PAGES write the summary to a file
-for page_name in LIST_OF_PAGES:
-  page = wikipedia.page(page_name)
-  # Change set before running!
-  with open(f'./training-data/set-2/{page_name}.txt', 'w') as f:
-    for category in page.categories:
-      f.write(category + "~")
-    f.write("\n||||||\n")
-    f.write(f'{page.title}\n')
-    f.write("||||||\n")
-    f.write(page.summary)
+  # time.sleep(random.randInt(0.5, 5))
