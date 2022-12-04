@@ -13,7 +13,7 @@ import string
 
 # gensim.corpora.TextCorpus -> plain text -> bow vectors
 # https://tedboy.github.io/nlps/generated/generated/gensim.corpora.TextCorpus.html#gensim.corpora.TextCorpus
-NUM_TOPICS = 25
+NUM_TOPICS = 30
 
 
 def remove_all_symbols(text: str) -> str:
