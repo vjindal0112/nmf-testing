@@ -13,16 +13,16 @@ import string
 
 # gensim.corpora.TextCorpus -> plain text -> bow vectors
 # https://tedboy.github.io/nlps/generated/generated/gensim.corpora.TextCorpus.html#gensim.corpora.TextCorpus
-NUM_TOPICS = 30
+NUM_TOPICS = 50
 
 
 def remove_all_symbols(text: str) -> str:
   text = re.sub("http[s]?\://\S+", "", text)  # remove urls
   text = re.sub(r"[0-9]", "", text)  # remove numbers
   text = re.sub(r"\n", " ", text)  # remove newlines
-  text = re.sub(r"\b[a-zA-Z]{1,2}\b", "", text)
   text = re.sub("[^a-zA-Z ]+", " ", text)  # remove all punctuation
   text = re.sub('\s+', ' ', text)  # remove extra spaces
+  text = re.sub(r"\b[a-zA-Z]{1,2}\b", "", text)  # remove 1-2 letter words
   return text
 
 
@@ -54,7 +54,7 @@ corpus = []
 for file_name in os.listdir('../set-3'):
   if file_name.endswith(".txt"):
     with open(f'../set-3/{file_name}', 'r') as f:
-      print(file_name)
+      #   print(file_name)
       file = f.read()
       # 0 -> categories, 1 -> title, 2 -> summary
       # file = file.split("||||||\n")
