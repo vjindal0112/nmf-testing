@@ -29,7 +29,7 @@ def load_and_use_model(request):
 
     # Create list of tags associated with each topic
     TOPICS_TO_TAGS = []
-    for topic in nmf.show_topics(num_topics=10, num_words=10, formatted=False):
+    for topic in nmf.show_topics(num_topics=50, num_words=2, formatted=False):
       # Example topic looks like:
       # (0, [('new', 0.04927730786772849), ('york', 0.045536340221838695), ('city', 0.03610552021069998), ('state', 0.022837394513592096), ('manhattan', 0.02158441764544512), ('world', 0.015081501532756553), ('united', 0.014942394226562994), ('computer', 0.014220414818740834), ('central', 0.013146910359001075), ('national', 0.012290741830119386)])
       TOPICS_TO_TAGS.append(topic[1][0][0])
