@@ -2,7 +2,7 @@
 This repo contains all of the code used to test and train a model to tag notes for our application NoteSmart.
 
 ## `create_wiki_training_data.py`
-Downloads wikipedia articles listed in `LIST_OF_PAGES.txt' into `training_set` folder
+Downloads wikipedia articles listed in `LIST_OF_PAGES.txt` into `training_set` folder
 
 ## `train_with_wiki.py`
 Creates the NMF model using the downloaded wikipedia files. Includes cleaning + training.
